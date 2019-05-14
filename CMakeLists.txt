@@ -43,6 +43,9 @@ set(PROGRAMS_J1939
     testj1939
 )
 
+set(TESTS_J1939
+)
+
 set(PROGRAMS
     ${PROGRAMS_CANLIB}
     bcmserver
@@ -62,8 +65,12 @@ set(PROGRAMS
     slcanpty
 )
 
+set(TESTS
+)
+
 if(NOT ANDROID)
   list(APPEND PROGRAMS ${PROGRAMS_J1939})
+  list(APPEND TESTS ${TESTS_J1939})
 
   add_library(j1939 STATIC
       libj1939.c
@@ -93,3 +100,21 @@ endforeach()
 
 
 ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_SOURCE_DIR}/cmake/make_uninstall.cmake")
+
+# Automatic tests
+enable_testing()
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "t")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "t")
+
+foreach (T ${TESTS})
+  file(GLOB ${T}_src tests/${T}.c)
+  add_executable(${T}.t ${${T}_src})
+  add_test(${T} ${CMAKE_CURRENT_BINARY_DIR}/t/${T}.t)
+
+  if("${T}" IN_LIST TESTS_J1939)
+    target_link_libraries(${T}.t
+        PRIVATE j1939
+    )
+  endif()
+endforeach()
