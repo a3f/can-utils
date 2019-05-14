@@ -44,6 +44,7 @@ set(PROGRAMS_J1939
 )
 
 set(TESTS_J1939
+    uapi-constraints
 )
 
 set(PROGRAMS
